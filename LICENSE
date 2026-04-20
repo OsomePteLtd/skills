@@ -1,21 +1,53 @@
-MIT License
+OSOME PROPRIETARY LICENSE
 
-Copyright (c) 2024 OSOME Pte Ltd
+Copyright (c) 2024 OSOME Pte Ltd. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This software and associated documentation files (the "Software") are the 
+proprietary property of OSOME Pte Ltd ("OSOME") and are protected by 
+copyright law and international treaty provisions.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+GRANT OF LICENSE
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Subject to the terms of this license, OSOME grants you a limited, 
+non-exclusive, non-transferable, revocable license to use the Software 
+solely in connection with OSOME services and the OSOME MCP server 
+(https://mcp.osome.com/mcp).
+
+RESTRICTIONS
+
+You may NOT:
+- Copy, modify, or distribute the Software except as expressly permitted
+- Reverse engineer, decompile, or disassemble the Software
+- Remove or alter any proprietary notices or labels
+- Use the Software for any purpose other than with OSOME services
+- Sublicense, sell, rent, or lease the Software to third parties
+- Use the Software to compete with OSOME services
+
+TERMINATION
+
+This license is effective until terminated. OSOME may terminate this 
+license at any time if you fail to comply with any term of this agreement. 
+Upon termination, you must destroy all copies of the Software.
+
+DISCLAIMER OF WARRANTIES
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL OSOME BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE.
+
+GOVERNING LAW
+
+This license shall be governed by and construed in accordance with the 
+laws of the Republic of Singapore.
+
+CONTACT
+
+OSOME Pte Ltd
+https://osome.com

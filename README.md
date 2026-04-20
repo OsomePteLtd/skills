@@ -93,4 +93,4 @@ Skills automatically adapt to your company's jurisdiction:
 
 ## License
 
-MIT
+Proprietary - OSOME Pte Ltd. See [LICENSE](./LICENSE) for details.

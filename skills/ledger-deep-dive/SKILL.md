@@ -1,30 +1,39 @@
 ---
 name: ledger-deep-dive
-description: Query specific transactions and accounts. Use when the user asks about specific expenses, account balances, journal entries, or transaction details. Requires OSOME MCP server at https://mcp.osome.com/mcp
+description: Search transactions by account and date range. Use when the user asks about specific expenses, transaction history, or account activity. Requires OSOME MCP server at https://mcp.osome.com/mcp
 ---
 
 # Ledger Deep Dive
 
-Answer specific questions about transactions and accounts.
+Search and analyze transactions by account.
 
 ## When to Use
 
 Invoke this skill when the user asks:
 - "What transactions hit [account name]?"
 - "Show me all marketing expenses"
-- "Journal entries for [period]"
-- "What's in my clearing accounts?"
-- "Explain this account balance"
-- "Transaction history for [account]"
 - "What did I spend on [category]?"
-- "Show me the details of [document/invoice]"
+- "Transaction history for [period]"
+- "What's in my clearing accounts?"
 - "How much did I spend on software/rent/marketing?"
-- "Find a specific payment"
-- "Details of invoice #[number]"
-- "What's in my suspense account?"
-- "Breakdown of [account]"
-- "List all [vendor] payments"
+- "Recent transactions"
 - "Search for [keyword] in transactions"
+
+## Limitations
+
+The MCP server provides:
+- Transaction search with date filtering (grouped by account)
+- Chart of accounts (code, name, type, class)
+- Document list (IDs and names only)
+- Journal entry list (ID, description, amount only)
+
+**Not available via MCP:**
+- Detailed invoice line items, quantities, rates
+- Journal entry DR/CR account breakdown
+- Document amounts, dates, or status
+- Contact/vendor details on documents
+
+For detailed document information, users should access the OSOME dashboard directly.
 
 ## MCP Server
 
@@ -38,152 +47,122 @@ https://mcp.osome.com/mcp
 | Step | Tool | Purpose |
 |------|------|---------|
 | 1 | `list-companies` | Select company |
-| 2 | `get-chart-of-accounts` | Full account list for branch |
-| 3 | `search-transactions` | Transaction search with filters |
-| 4 | `get-journal-entries` | Double-entry journal records |
-| 5 | `get-document` | Individual document details |
+| 2 | `get-chart-of-accounts` | Find account codes by name |
+| 3 | `search-transactions` | Transaction search with date filter |
 
 ## Execution Flow
 
 1. Call `list-companies` and select company
-2. Call `get-company` to determine branch (SG/HK/UK)
-3. Call `get-chart-of-accounts` with branch
-4. If user asks about specific account:
-   - Match account name to chart of accounts
-   - Call `search-transactions` filtered by account
-5. If user asks about specific document:
-   - Call `get-document` with document ID
-6. If user asks about journal entries:
-   - Call `get-journal-entries` with date range
-7. Present detailed breakdown
+2. Call `get-chart-of-accounts` with branch (SG/HK/UK) to find relevant account codes
+3. Call `search-transactions` with:
+   - `id`: company ID
+   - `dateFrom`: start date (YYYY-MM-DD)
+   - `dateTo`: end date (YYYY-MM-DD)
+   - `limit`: max transactions (default 50, newest first)
+4. Filter results by account name/code if user specified
+5. Present transaction summary
 
-## Jurisdiction-Specific Accounts
+## Chart of Accounts Response
 
-The chart of accounts varies by jurisdiction:
+```json
+{
+  "accounts": [
+    { "code": "200", "name": "Accounts Receivable", "type": "current_asset", "accountClass": "asset" },
+    { "code": "400", "name": "Office Supplies", "type": "expense", "accountClass": "expense" }
+  ]
+}
+```
 
-| Branch | Notable Accounts |
-|--------|-----------------|
-| SG | GST Input Tax, GST Output Tax, CPF Payable |
-| UK | VAT Input, VAT Output, PAYE Payable, NI Payable |
-| HK | MPF Payable (no GST/VAT) |
+## Transaction Response Structure
+
+Transactions are returned grouped by account:
+
+```json
+{
+  "report": {
+    "headings": ["Date", "Description", "Amount", ...],
+    "groups": [
+      {
+        "name": "Marketing Expenses (6200)",
+        "lines": [
+          ["2024-09-15", "Google Ads", "-8500.00", ...],
+          ["2024-09-01", "Facebook Ads", "-6200.00", ...]
+        ]
+      }
+    ]
+  }
+}
+```
 
 ## Output Format
 
-### Account Query Response
+### Transaction Query Response
 
 **Account:** [Account Name] ([Account Code])
-**Type:** [Asset/Liability/Equity/Revenue/Expense]
-**Current Balance:** [amount]
+**Period:** [date range]
 
-**Transaction History:**
-| Date | Description | Debit | Credit | Running Balance |
-|------|-------------|-------|--------|-----------------|
-| ... | ... | ... | ... | ... |
-
-**Summary:**
-- Total debits: [amount]
-- Total credits: [amount]
-- Net movement: [amount]
-
----
-
-### Document Query Response
-
-**Document:** [Invoice/Bill/Receipt] #[number]
-**Date:** [date]
-**Contact:** [customer/vendor name]
-**Status:** [draft/approved/paid/voided]
-
-**Line Items:**
-| Description | Account | Amount | Tax |
-|-------------|---------|--------|-----|
-| ... | ... | ... | ... |
-
-**Total:** [amount]
-**Tax:** [amount]
-**Grand Total:** [amount]
-
-**Journal Entry:**
-| Account | Debit | Credit |
-|---------|-------|--------|
+**Transactions:**
+| Date | Description | Amount |
+|------|-------------|--------|
 | ... | ... | ... |
 
----
-
-### Journal Entries Query Response
-
-**Period:** [date range]
-**Total Entries:** [count]
-
-| Date | Reference | Description | Account | Debit | Credit |
-|------|-----------|-------------|---------|-------|--------|
-| ... | ... | ... | ... | ... | ... |
+**Summary:**
+- Total transactions: [count]
+- Net amount: [sum]
 
 ## Examples
 
 **User:** "What did I spend on marketing this quarter?"
 
 **Response:**
-> **Marketing Expenses (Account 6200) - Q3 2024**
->
-> **Total:** SGD 38,500
+> **Marketing Expenses (6200) - Q3 2024**
 >
 > | Date | Description | Amount |
 > |------|-------------|--------|
-> | Sep 15 | Google Ads | SGD 8,500 |
-> | Sep 1 | Facebook Ads | SGD 6,200 |
-> | Aug 20 | Marketing Agency | SGD 12,000 |
-> | Aug 5 | LinkedIn Premium | SGD 1,800 |
-> | Jul 28 | Trade Show Booth | SGD 10,000 |
+> | Sep 15 | Google Ads | -SGD 8,500 |
+> | Sep 1 | Facebook Ads | -SGD 6,200 |
+> | Aug 20 | Agency Fee | -SGD 12,000 |
 >
-> Marketing is 12% of total expenses this quarter.
+> **Total:** SGD 26,700 across 3 transactions
 
 ---
 
-**User:** "Show me invoice #INV-2024-089"
+**User:** "Show me recent transactions"
 
 **Response:**
-> **Invoice #INV-2024-089**
-> - Customer: TechCorp Pte Ltd
-> - Date: Sep 10, 2024
-> - Status: Approved (unpaid)
+> **Recent Transactions (Last 50)**
 >
-> | Item | Qty | Rate | Amount |
-> |------|-----|------|--------|
-> | Consulting Services | 40 hrs | SGD 150 | SGD 6,000 |
-> | Software License | 1 | SGD 2,500 | SGD 2,500 |
+> | Date | Account | Description | Amount |
+> |------|---------|-------------|--------|
+> | Sep 20 | Bank | Transfer In | +SGD 50,000 |
+> | Sep 18 | Rent | Office Lease | -SGD 8,000 |
+> | Sep 15 | Marketing | Google Ads | -SGD 8,500 |
 >
-> Subtotal: SGD 8,500
-> GST (9%): SGD 765
-> **Total: SGD 9,265**
->
-> **Journal Entry:**
-> - DR Accounts Receivable: SGD 9,265
-> - CR Revenue: SGD 8,500
-> - CR GST Output: SGD 765
+> Showing 50 most recent transactions.
 
 ---
 
 **User:** "What's in my clearing accounts?"
 
 **Response:**
-> **Clearing Accounts Summary**
+> Let me search for clearing account transactions...
 >
-> | Account | Balance | Needs Attention |
-> |---------|---------|-----------------|
-> | Suspense Account | SGD 1,250 | 3 uncleared items |
-> | Clearing - PayNow | SGD 0 | Cleared |
-> | Clearing - Bank Transfer | SGD 5,400 | 2 pending items |
+> **Clearing - Bank Transfer (1150)**
+> | Date | Description | Amount |
+> |------|-------------|--------|
+> | Sep 10 | Pending transfer | SGD 5,400 |
 >
-> **Suspense Account Details (SGD 1,250):**
-> 1. Aug 15: Unknown deposit SGD 500 - needs identification
-> 2. Aug 22: Unmatched payment SGD 450 - check with vendor
-> 3. Sep 1: Partial payment SGD 300 - awaiting reconciliation
+> **Suspense Account (1160)**
+> | Date | Description | Amount |
+> |------|-------------|--------|
+> | Aug 15 | Unidentified deposit | SGD 500 |
+>
+> Total uncleared: SGD 5,900
 
 ## Error Handling
 
 | Scenario | Response |
 |----------|----------|
-| Account not found | Suggest similar account names from chart of accounts |
-| No transactions | "No transactions found for this account in the specified period" |
-| Document not found | "Document not found. Check the document ID or search by date/vendor" |
+| Account not found | List similar accounts from chart of accounts |
+| No transactions | "No transactions found in this period" |
+| Date range too wide | Suggest narrowing to last quarter |

@@ -41,7 +41,24 @@ https://mcp.osome.com/mcp
 | 2 | `get-company` | Company context |
 | 3 | `get-aged-receivables` | Customer invoices by age bucket |
 | 4 | `get-aged-payables` | Vendor bills by age bucket |
-| 5 | `list-documents` | Supporting invoice/bill details |
+| 5 | `get-bank-accounts` | Current cash for context |
+
+## Data Available
+
+**From `get-aged-receivables` / `get-aged-payables`:**
+- Report format with headings and line items
+- Customer/vendor names (in report lines)
+- Amounts by aging bucket
+- Structure: `{ report: { headings: [...], lines: [...] } }`
+
+**From `get-bank-accounts`:**
+- Account balances to show available cash
+
+## Limitations
+
+- **Document details limited** - `list-documents` only returns `{ id, name }`, not amounts or due dates
+- **Invoice line items not available** - For detailed invoice info, users should access OSOME dashboard
+- **Report structure varies** - Actual field names depend on upstream report format
 
 ## Execution Flow
 
@@ -49,8 +66,26 @@ https://mcp.osome.com/mcp
 2. Call `get-company` for context
 3. Call `get-aged-receivables` (as of today or specified date)
 4. Call `get-aged-payables` (as of today or specified date)
-5. Optionally call `list-documents` for document-level detail
-6. Analyze aging and present prioritized view
+5. Call `get-bank-accounts` for cash context
+6. Parse report data to extract aging buckets
+7. Present prioritized view
+
+## Report Structure
+
+Aged reports return data like:
+```json
+{
+  "report": {
+    "headings": ["Contact", "Current", "1-30 Days", "31-60 Days", "61-90 Days", "90+ Days", "Total"],
+    "lines": [
+      ["TechCorp Pte Ltd", 5000, 0, 2000, 0, 0, 7000],
+      ["StartupXYZ", 0, 3000, 0, 0, 0, 3000]
+    ]
+  }
+}
+```
+
+Parse according to the headings returned.
 
 ## Output Format
 
@@ -58,20 +93,16 @@ https://mcp.osome.com/mcp
 
 **Total Outstanding:** [amount]
 
-| Age Bucket | Amount | % of Total | Count |
-|------------|--------|------------|-------|
-| Current (0-30 days) | [amount] | [%] | [n] |
-| 31-60 days | [amount] | [%] | [n] |
-| 61-90 days | [amount] | [%] | [n] |
-| 90+ days (Overdue) | [amount] | [%] | [n] |
+| Age Bucket | Amount | % of Total |
+|------------|--------|------------|
+| Current (0-30 days) | [amount] | [%] |
+| 31-60 days | [amount] | [%] |
+| 61-90 days | [amount] | [%] |
+| 90+ days (Overdue) | [amount] | [%] |
 
-**Top 5 Customers by Outstanding:**
-1. [Customer Name]: [amount] - [days] days avg
-2. ...
-
-**Collection Priority:**
-- Urgent (90+ days): [amount] from [n] customers
-- Follow up (60-90 days): [amount] from [n] customers
+**Customers with Outstanding (from report):**
+- [Customer Name]: [amount]
+- ...
 
 ---
 
@@ -79,75 +110,70 @@ https://mcp.osome.com/mcp
 
 **Total Outstanding:** [amount]
 
-| Age Bucket | Amount | % of Total | Count |
-|------------|--------|------------|-------|
-| Current (0-30 days) | [amount] | [%] | [n] |
-| 31-60 days | [amount] | [%] | [n] |
-| 61-90 days | [amount] | [%] | [n] |
-| 90+ days (Overdue) | [amount] | [%] | [n] |
+| Age Bucket | Amount | % of Total |
+|------------|--------|------------|
+| Current (0-30 days) | [amount] | [%] |
+| 31-60 days | [amount] | [%] |
+| 61-90 days | [amount] | [%] |
+| 90+ days (Overdue) | [amount] | [%] |
 
-**Top 5 Vendors by Outstanding:**
-1. [Vendor Name]: [amount] - due [date]
-2. ...
-
-**Payment Priority:**
-- Overdue (90+ days): [amount] to [n] vendors
-- Due soon (0-30 days): [amount] to [n] vendors
+**Vendors with Outstanding (from report):**
+- [Vendor Name]: [amount]
+- ...
 
 ---
 
-### Net Position
+### Cash Context
 
-**Net Working Capital Impact:** [AR - AP]
-- If positive: You are owed more than you owe
-- If negative: You owe more than you are owed
+**Current Cash Position:** [from bank accounts]
+**AR - AP Net:** [receivables - payables]
 
 ## Example
 
 **User:** "Who owes me money?"
 
 **Response:**
-> **Accounts Receivable: SGD 156,000 outstanding**
+> **Accounts Receivable Report**
 >
-> | Age | Amount | Invoices |
-> |-----|--------|----------|
-> | Current | SGD 85,000 | 12 |
-> | 31-60 days | SGD 42,000 | 5 |
-> | 61-90 days | SGD 18,000 | 3 |
-> | 90+ days | SGD 11,000 | 2 |
+> | Customer | Current | 31-60 | 61-90 | 90+ | Total |
+> |----------|---------|-------|-------|-----|-------|
+> | TechCorp | 45,000 | 0 | 0 | 0 | 45,000 |
+> | StartupXYZ | 20,000 | 8,000 | 0 | 0 | 28,000 |
+> | BigClient | 0 | 0 | 22,000 | 0 | 22,000 |
 >
-> **Top customers to follow up:**
-> 1. TechCorp Pte Ltd: SGD 45,000 (52 days avg)
-> 2. StartupXYZ: SGD 28,000 (38 days avg)
-> 3. BigClient Inc: SGD 22,000 (65 days avg)
+> **Summary:**
+> - Total AR: SGD 95,000
+> - Current: SGD 65,000 (68%)
+> - Overdue (60+): SGD 22,000 (23%)
 >
-> **Action needed:** SGD 29,000 is overdue (60+ days). Consider sending reminders to 5 customers.
+> **Action:** Follow up with BigClient on SGD 22,000 (61-90 days).
 
 ---
 
 **User:** "What bills do I need to pay?"
 
 **Response:**
-> **Accounts Payable: SGD 78,000 outstanding**
+> **Accounts Payable Report**
 >
-> | Age | Amount | Bills |
-> |-----|--------|-------|
-> | Current | SGD 52,000 | 8 |
-> | 31-60 days | SGD 18,000 | 3 |
-> | 61-90 days | SGD 5,000 | 1 |
-> | 90+ days | SGD 3,000 | 1 |
+> | Vendor | Current | 31-60 | 61-90 | 90+ | Total |
+> |--------|---------|-------|-------|-----|-------|
+> | AWS | 12,500 | 0 | 0 | 0 | 12,500 |
+> | Landlord | 8,000 | 0 | 0 | 0 | 8,000 |
+> | Supplier | 0 | 0 | 0 | 3,000 | 3,000 |
 >
-> **Priority payments:**
-> 1. AWS Singapore: SGD 12,500 (due in 5 days)
-> 2. Office Landlord: SGD 8,000 (due in 10 days)
-> 3. Supplier ABC: SGD 3,000 (92 days overdue!)
+> **Summary:**
+> - Total AP: SGD 23,500
+> - Due soon (Current): SGD 20,500
+> - Overdue (90+): SGD 3,000
 >
-> **Cash needed:** SGD 52,000 due within 30 days. You have SGD 245,000 in bank accounts.
+> **Cash available:** SGD 245,000 (from bank accounts)
+> **Coverage:** 10x current payables
 
 ## Error Handling
 
 | Scenario | Response |
 |----------|----------|
-| No receivables | "Great news - no outstanding customer invoices!" |
-| No payables | "No outstanding bills to pay" |
-| Very old items (180+ days) | Flag as potential bad debt / write-off candidates |
+| No receivables | "No outstanding customer invoices found." |
+| No payables | "No outstanding bills to pay." |
+| Report parsing error | Show raw report data and explain structure |
+| Very old items (180+ days) | Flag as potential bad debt |

@@ -1,6 +1,6 @@
 ---
 name: tax-compliance-snapshot
-description: Check tax obligations, GST/VAT status, and prepare for tax filing. Use when the user asks about tax due, GST, VAT, tax preparation, or compliance deadlines. Requires OSOME MCP server at https://mcp.osome.com/mcp
+description: Check tax obligations and prepare for tax filing. Use when the user asks about tax due, GST, VAT, tax preparation, or compliance deadlines. Requires OSOME MCP server at https://mcp.osome.com/mcp
 ---
 
 # Tax & Compliance Snapshot
@@ -32,114 +32,100 @@ https://mcp.osome.com/mcp
 | Step | Tool | Purpose |
 |------|------|---------|
 | 1 | `list-companies` | Select company |
-| 2 | `get-company` | Jurisdiction, fiscal year, GST registration |
-| 3 | `get-trial-balance` | GST/VAT account balances |
-| 4 | `get-chart-of-accounts` | Identify tax-related accounts |
+| 2 | `get-company` | Get fiscal year end |
+| 3 | `get-trial-balance` | Account balances including tax accounts |
+| 4 | `get-chart-of-accounts` | Identify tax-related account codes |
 | 5 | `get-profit-and-loss` | Revenue and expenses for tax computation |
-| 6 | `get-balance-sheet` | Assets and liabilities snapshot |
+
+## Data Available
+
+**From `get-company`:**
+- Company ID, name
+- Next fiscal year end date
+
+**From `get-chart-of-accounts` (requires branch parameter):**
+- Account codes, names, types
+- Tax accounts like GST Input/Output
+
+**From `get-trial-balance`:**
+- Report with account balances
+- Tax account balances (if accounts exist)
+
+**From `get-profit-and-loss`:**
+- Revenue and expense totals
+- Net profit for tax estimation
+
+## Limitations
+
+- **Jurisdiction not returned by API** - Ask user for their jurisdiction (SG/HK/UK/UAE) or infer from company name
+- **GST registration status not available** - Check if GST accounts exist in trial balance as proxy
+- **Filing deadlines not from API** - Use standard deadlines based on jurisdiction
 
 ## Execution Flow
 
 1. Call `list-companies` and select company
-2. Call `get-company` to determine:
-   - Jurisdiction (SG/HK/UK/UAE)
-   - GST/VAT registration status
-   - Fiscal year end date
-3. Call `get-chart-of-accounts` to find tax accounts:
-   - SG: GST Input Tax, GST Output Tax, GST Payable
-   - UK: VAT Input, VAT Output, VAT Control
-   - HK: No GST/VAT (skip this step)
-4. Call `get-trial-balance` as of today
-5. Extract tax account balances
-6. Call `get-profit-and-loss` for the current period
-7. Synthesize tax position summary
+2. Call `get-company` to get fiscal year end
+3. Ask user for jurisdiction if not obvious from company name
+4. Call `get-chart-of-accounts` with branch (SG/HK/UK)
+5. Call `get-trial-balance` with date range
+6. Look for GST/VAT accounts in the report
+7. Call `get-profit-and-loss` for revenue/expense totals
+8. Calculate estimated tax position
 
-## Jurisdiction-Specific Tax
+## Jurisdiction Tax Reference
 
-| Jurisdiction | Tax Type | Rate | Filing Frequency |
-|--------------|----------|------|------------------|
-| Singapore | GST | 9% | Quarterly |
-| UK | VAT | 20% | Quarterly |
-| Hong Kong | None | - | Annual profits tax only |
-| UAE | VAT | 5% | Quarterly |
+| Jurisdiction | Tax Type | Rate | Quarterly Deadlines |
+|--------------|----------|------|---------------------|
+| Singapore | GST | 9% | Apr 30, Jul 31, Oct 31, Jan 31 |
+| UK | VAT | 20% | Varies by registration |
+| Hong Kong | Profits Tax | 8.25%/16.5% | Annual only |
+| UAE | VAT | 5% | 28 days after quarter end |
 
 ## Output Format
 
-### GST/VAT Summary (SG/UK/UAE only)
+### GST/VAT Position
 
-**GST/VAT Position as of [date]:**
+**Based on Trial Balance (if GST accounts found):**
 
-| Account | Balance | Notes |
-|---------|---------|-------|
-| Output Tax (collected) | [amount] | Tax charged to customers |
-| Input Tax (paid) | [amount] | Tax paid on purchases |
-| **Net Payable/(Refundable)** | [amount] | Output - Input |
-
-**Filing Status:**
-- Current quarter: [Q1/Q2/Q3/Q4 YYYY]
-- Filing deadline: [date]
-- Days until due: [n] days
-
-**Quarter Breakdown:**
-| Month | Sales | GST Collected | Purchases | GST Paid |
-|-------|-------|---------------|-----------|----------|
-| [Month 1] | [amount] | [amount] | [amount] | [amount] |
-| [Month 2] | [amount] | [amount] | [amount] | [amount] |
-| [Month 3] | [amount] | [amount] | [amount] | [amount] |
-
----
+| Account | Balance |
+|---------|---------|
+| GST Output Tax | [amount] |
+| GST Input Tax | [amount] |
+| Net Payable | [output - input] |
 
 ### Tax Filing Preparation
 
-**Documents Ready:**
-- [ ] Profit & Loss Statement
-- [ ] Balance Sheet
-- [ ] Trial Balance
-- [ ] Bank Statements
-- [ ] GST/VAT Returns (if applicable)
-
-**Key Figures for Tax:**
+**From P&L Report:**
 | Item | Amount |
 |------|--------|
 | Total Revenue | [amount] |
 | Total Expenses | [amount] |
-| Net Profit Before Tax | [amount] |
-| Estimated Tax (at [rate]%) | [amount] |
+| Net Profit | [amount] |
+| Estimated Tax | [amount at rate%] |
 
-**Fiscal Year:**
-- Current FY: [start] to [end]
-- Days until year end: [n] days
-
----
-
-### Compliance Calendar
-
-| Obligation | Due Date | Status |
-|------------|----------|--------|
-| GST/VAT Filing Q[n] | [date] | [Upcoming/Overdue] |
-| Annual Return | [date] | [Upcoming/Overdue] |
-| Corporate Tax (ECI) | [date] | [Upcoming/Overdue] |
+**Fiscal Year:** [start] to [end]
 
 ## Examples
 
 **User:** "How much GST do I owe?"
 
 **Response:**
+> I'll check your GST position. What jurisdiction is your company registered in? (SG/UK/UAE)
+>
+> *[After user confirms Singapore]*
+>
 > **GST Position - ACME Pte Ltd**
 >
-> As of October 15, 2024:
->
-> | | Amount |
-> |---|--------|
-> | GST Collected (Output) | SGD 28,500 |
-> | GST Paid (Input) | SGD 12,300 |
+> From trial balance:
+> | Account | Balance |
+> |---------|---------|
+> | GST Output Tax (collected) | SGD 28,500 |
+> | GST Input Tax (paid) | SGD 12,300 |
 > | **Net GST Payable** | **SGD 16,200** |
 >
-> **Q3 2024 Filing:**
-> - Filing deadline: October 31, 2024
-> - 16 days remaining
+> **Standard Q3 deadline:** October 31
 >
-> You need to pay SGD 16,200 to IRAS by month end.
+> Note: Verify these figures match your GST F5 form before filing.
 
 ---
 
@@ -148,40 +134,34 @@ https://mcp.osome.com/mcp
 **Response:**
 > **Tax Filing Preparation - ACME Pte Ltd**
 >
-> **Fiscal Year:** Jan 1 - Dec 31, 2024
-> **Days until year end:** 77 days
+> **Fiscal Year End:** December 31, 2024
 >
-> **Year-to-Date Summary:**
+> **From Profit & Loss:**
 > | | Amount |
 > |---|--------|
 > | Total Revenue | SGD 890,000 |
 > | Total Expenses | SGD 765,000 |
 > | Net Profit | SGD 125,000 |
-> | Estimated Tax (17%) | SGD 21,250 |
 >
-> **Documents Available:**
-> - Profit & Loss - Ready
-> - Balance Sheet - Ready
-> - Trial Balance - Ready
-> - GST F5 Returns (Q1-Q3) - Filed
+> **Available Reports:**
+> - Balance Sheet - via `get-balance-sheet`
+> - Profit & Loss - via `get-profit-and-loss`
+> - Trial Balance - via `get-trial-balance`
 >
-> **Next Steps:**
-> 1. Review P&L for any missing expenses
-> 2. Ensure all invoices are recorded
-> 3. Reconcile bank accounts
-> 4. File Q4 GST by Jan 31, 2025
-> 5. Submit ECI within 3 months of year end
+> **For complete tax filing, you'll also need:**
+> - Bank statements (from your bank)
+> - Supporting documents (access via OSOME dashboard)
 
 ---
 
-**User:** "What's my tax situation?" (Hong Kong company)
+**User:** "What's my tax situation?" (Hong Kong)
 
 **Response:**
 > **Tax Position - ACME HK Limited**
 >
 > Hong Kong does not have GST/VAT.
 >
-> **Profits Tax Summary:**
+> **From Profit & Loss:**
 > | | Amount |
 > |---|--------|
 > | Total Revenue | HKD 2,500,000 |
@@ -189,19 +169,17 @@ https://mcp.osome.com/mcp
 > | Net Profit | HKD 700,000 |
 >
 > **Estimated Profits Tax:**
-> - First HKD 2M: 8.25% = HKD 57,750
-> - Above HKD 2M: 16.5% = HKD 0
-> - **Total: HKD 57,750**
+> - First HKD 2M profit: 8.25%
+> - Above HKD 2M: 16.5%
+> - Estimate: ~HKD 57,750
 >
-> **Filing Deadline:**
-> - Profits Tax Return due: [date based on FY]
-> - Singed accounts required: Yes
+> Note: Actual tax depends on allowable deductions and tax positions.
 
 ## Error Handling
 
 | Scenario | Response |
 |----------|----------|
-| No GST registration | "This company is not GST-registered. Only profits tax applies." |
-| HK company asking about GST | "Hong Kong does not have GST/VAT. Showing profits tax info instead." |
-| Missing tax accounts | "Tax accounts not found in chart of accounts. Please check GST registration." |
-| No P&L data | "No financial data for this period. Has bookkeeping been completed?" |
+| No GST accounts in trial balance | "No GST accounts found. Company may not be GST-registered." |
+| HK company asking about GST | "Hong Kong does not have GST/VAT. Showing profits tax info." |
+| Empty P&L | "No financial data for this period. Has bookkeeping been completed?" |
+| Jurisdiction unknown | Ask user to confirm their company's jurisdiction |

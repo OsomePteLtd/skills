@@ -4,7 +4,7 @@ Agent skills for accounting and bookkeeping, powered by the [OSOME MCP Server](h
 
 ## Prerequisites
 
-Connect the OSOME MCP server to your Claude environment:
+Connect the OSOME MCP server to your Claude/OpenCode environment:
 
 ```
 https://mcp.osome.com/mcp
@@ -20,77 +20,61 @@ This provides access to accounting tools for your OSOME-managed companies.
 | [cash-flow-visibility](./skills/cash-flow-visibility) | Understand where money is coming from and going |
 | [receivables-payables-tracker](./skills/receivables-payables-tracker) | Track who owes you and who you owe |
 | [ledger-deep-dive](./skills/ledger-deep-dive) | Query specific transactions and accounts |
-| [corporate-structure-overview](./skills/corporate-structure-overview) | View directors, shareholders, and subsidiaries |
+| [corporate-structure-overview](./skills/corporate-structure-overview) | View directors and subsidiaries |
 | [tax-compliance-snapshot](./skills/tax-compliance-snapshot) | Check GST/VAT obligations and prepare for tax filing |
 
 ## Installation
 
-### Claude Code (Recommended)
+### Claude Code
 
-**Step 1:** Add the OSOME marketplace:
-
-```
-/plugin marketplace add OsomePteLtd/skills
-```
-
-**Step 2:** Install the plugin:
+Install directly from GitHub:
 
 ```
-/plugin install osome-accounting-skills@osomepteltd-skills
+/plugin install github:OsomePteLtd/skills
 ```
 
-**Step 3:** Reload plugins:
+### OpenCode
 
-```
-/reload-plugins
-```
-
-### Manual Installation
-
-Clone and copy skills to your personal skills directory:
+Copy skills to your config directory:
 
 ```bash
 git clone https://github.com/OsomePteLtd/skills.git osome-skills
-cp -r osome-skills/skills/* ~/.claude/skills/
+cp -r osome-skills/skills/* ~/.config/opencode/skills/
 ```
 
-Or copy to a project's `.claude/skills/` directory for project-scoped installation.
+Or for project-scoped installation:
 
-### Team/Project Configuration
+```bash
+cp -r osome-skills/skills/* .opencode/skills/
+```
 
-Add to your project's `.claude/settings.json` for automatic team installation:
+### Manual Installation (Any Agent)
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "osome-skills": {
-      "source": {
-        "source": "github",
-        "repo": "OsomePteLtd/skills"
-      }
-    }
-  }
-}
+Copy skills to your agent's skills directory:
+
+```bash
+git clone https://github.com/OsomePteLtd/skills.git osome-skills
+
+# For Claude Code
+cp -r osome-skills/skills/* ~/.claude/skills/
+
+# For OpenCode
+cp -r osome-skills/skills/* ~/.config/opencode/skills/
+
+# For any agent supporting .agents/ convention
+cp -r osome-skills/skills/* ~/.agents/skills/
 ```
 
 ## Usage
 
 Once installed, skills are automatically triggered by relevant questions:
 
-- "Am I making money?" - triggers `financial-health-check`
-- "Where is my money going?" - triggers `cash-flow-visibility`
-- "Who hasn't paid me?" - triggers `receivables-payables-tracker`
-- "What did I spend on software?" - triggers `ledger-deep-dive`
-- "Who owns the company?" - triggers `corporate-structure-overview`
-- "How much GST do I owe?" - triggers `tax-compliance-snapshot`
-
-You can also invoke skills directly:
-
-```
-/osome-accounting-skills:financial-health-check
-/osome-accounting-skills:cash-flow-visibility
-/osome-accounting-skills:tax-compliance-snapshot
-```
+- "Am I making money?" → `financial-health-check`
+- "Where is my money going?" → `cash-flow-visibility`
+- "Who hasn't paid me?" → `receivables-payables-tracker`
+- "What did I spend on software?" → `ledger-deep-dive`
+- "Who are my directors?" → `corporate-structure-overview`
+- "How much GST do I owe?" → `tax-compliance-snapshot`
 
 ## MCP Tools
 
@@ -103,13 +87,13 @@ These skills orchestrate tools from the OSOME MCP server:
 ### Accounting
 - `get-chart-of-accounts` - Chart of accounts by jurisdiction
 - `search-transactions` - Search transactions with filters
-- `list-documents` - Accounting documents
-- `get-document` - Document details
-- `get-journal-entries` - Journal entries
+- `list-documents` - Accounting documents (ID and name only)
+- `get-document` - Document details (ID and name only)
+- `get-journal-entries` - Journal entries (ID, description, amount)
 - `get-bank-accounts` - Bank accounts and balances
 
 ### Reports
-- `get-balance-sheet` - Balance sheet
+- `get-balance-sheet` - Balance sheet report
 - `get-profit-and-loss` - Profit & loss statement
 - `get-cash-flow-statement` - Cash flow statement
 - `get-trial-balance` - Trial balance
@@ -118,11 +102,11 @@ These skills orchestrate tools from the OSOME MCP server:
 
 ### Compliance
 - `get-corporate-subsidiaries` - Subsidiary companies
-- `get-directors-shareholders` - Directors and shareholders
+- `get-directors-shareholders` - Directors (name, role, jurisdiction)
 
 ## Multi-Jurisdiction Support
 
-Skills automatically adapt to your company's jurisdiction:
+Skills work with companies in these jurisdictions:
 
 | Jurisdiction | Tax System | Currency |
 |--------------|------------|----------|

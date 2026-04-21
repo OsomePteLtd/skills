@@ -1,0 +1,19 @@
+{
+  "name": "osome-accounting-skills",
+  "version": "1.0.0",
+  "description": "Accounting and bookkeeping skills for OSOME customers, powered by the OSOME MCP server at https://mcp.osome.com/mcp",
+  "author": {
+    "name": "OSOME Pte Ltd",
+    "email": "support@osome.com"
+  },
+  "repository": "https://github.com/OsomePteLtd/skills",
+  "license": "Proprietary",
+  "skills": [
+    "./skills/financial-health-check",
+    "./skills/cash-flow-visibility",
+    "./skills/receivables-payables-tracker",
+    "./skills/ledger-deep-dive",
+    "./skills/corporate-structure-overview",
+    "./skills/tax-compliance-snapshot"
+  ]
+}

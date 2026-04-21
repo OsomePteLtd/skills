@@ -10,14 +10,17 @@ Understand ownership, directors, and subsidiaries.
 ## When to Use
 
 Invoke this skill when the user asks:
-- "Who are my company directors?"
-- "What's my corporate structure?"
-- "Subsidiaries and shareholders"
-- "Show me the ownership structure"
+- "Who are my directors?"
 - "Who owns the company?"
-- "List my directors"
-- "Company officers"
+- "Shareholder breakdown"
+- "Ownership structure"
+- "Cap table"
+- "List my subsidiaries"
 - "Group structure"
+- "Corporate structure for investors"
+- "Company officers"
+- "Who's on the board?"
+- "Equity split"
 
 ## MCP Server
 

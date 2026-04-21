@@ -11,13 +11,17 @@ Track who owes you money and who you owe.
 
 Invoke this skill when the user asks:
 - "Who owes me money?"
-- "What bills do I need to pay?"
+- "Who hasn't paid me?"
+- "Chase up invoices"
 - "Outstanding invoices"
-- "Aged receivables"
-- "Aged payables"
-- "What's overdue?"
+- "What bills do I need to pay?"
+- "What do I owe?"
+- "Overdue payments"
 - "Collection status"
-- "Accounts receivable / accounts payable"
+- "Aged receivables / payables"
+- "Client hasn't paid"
+- "Unpaid invoices"
+- "Bills due soon"
 
 ## MCP Server
 

@@ -21,6 +21,7 @@ This provides access to accounting tools for your OSOME-managed companies.
 | [receivables-payables-tracker](./skills/receivables-payables-tracker) | Track who owes you and who you owe |
 | [ledger-deep-dive](./skills/ledger-deep-dive) | Query specific transactions and accounts |
 | [corporate-structure-overview](./skills/corporate-structure-overview) | View directors, shareholders, and subsidiaries |
+| [tax-compliance-snapshot](./skills/tax-compliance-snapshot) | Check GST/VAT obligations and prepare for tax filing |
 
 ## Installation
 
@@ -76,17 +77,19 @@ Add to your project's `.claude/settings.json` for automatic team installation:
 
 Once installed, skills are automatically triggered by relevant questions:
 
-- "How is my business doing financially?" - triggers `financial-health-check`
+- "Am I making money?" - triggers `financial-health-check`
 - "Where is my money going?" - triggers `cash-flow-visibility`
-- "Who owes me money?" - triggers `receivables-payables-tracker`
-- "What did I spend on marketing?" - triggers `ledger-deep-dive`
-- "Who are my company directors?" - triggers `corporate-structure-overview`
+- "Who hasn't paid me?" - triggers `receivables-payables-tracker`
+- "What did I spend on software?" - triggers `ledger-deep-dive`
+- "Who owns the company?" - triggers `corporate-structure-overview`
+- "How much GST do I owe?" - triggers `tax-compliance-snapshot`
 
 You can also invoke skills directly:
 
 ```
 /osome-accounting-skills:financial-health-check
 /osome-accounting-skills:cash-flow-visibility
+/osome-accounting-skills:tax-compliance-snapshot
 ```
 
 ## MCP Tools

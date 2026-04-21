@@ -19,7 +19,8 @@
         "./skills/cash-flow-visibility",
         "./skills/receivables-payables-tracker",
         "./skills/ledger-deep-dive",
-        "./skills/corporate-structure-overview"
+        "./skills/corporate-structure-overview",
+        "./skills/tax-compliance-snapshot"
       ]
     }
   ]

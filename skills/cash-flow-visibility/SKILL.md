@@ -11,11 +11,15 @@ Understand where money is coming from and going to.
 
 Invoke this skill when the user asks:
 - "Where is my money going?"
+- "Why am I always broke?"
+- "What am I spending on?"
+- "Show me my expenses"
+- "What are my biggest costs?"
 - "Cash flow analysis"
-- "Show me my cash movements"
-- "What are my biggest expenses?"
-- "How is cash flowing through my business?"
-- "Analyze my spending"
+- "Burn rate"
+- "Monthly spend breakdown"
+- "Am I spending too much?"
+- "Where did the money go?"
 
 ## MCP Server
 

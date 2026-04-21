@@ -1,0 +1,51 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "osome-accounting-skills",
+  "version": "1.0.0",
+  "description": "Accounting and bookkeeping skills for OSOME customers, powered by the OSOME MCP server",
+  "owner": {
+    "name": "OSOME Pte Ltd",
+    "email": "support@osome.com"
+  },
+  "plugins": [
+    {
+      "name": "financial-health-check",
+      "description": "Get a snapshot of your company's financial position including balance sheet, profit & loss, and cash positions",
+      "version": "1.0.0",
+      "source": "./skills/financial-health-check",
+      "category": "accounting"
+    },
+    {
+      "name": "cash-flow-visibility",
+      "description": "Understand where money is coming from and going to with cash flow analysis and expense breakdown",
+      "version": "1.0.0",
+      "source": "./skills/cash-flow-visibility",
+      "category": "accounting"
+    },
+    {
+      "name": "receivables-payables-tracker",
+      "description": "Track accounts receivable and payable with aging analysis to manage collections and payments",
+      "version": "1.0.0",
+      "source": "./skills/receivables-payables-tracker",
+      "category": "accounting"
+    },
+    {
+      "name": "ledger-deep-dive",
+      "description": "Query specific transactions, accounts, and journal entries for detailed bookkeeping analysis",
+      "version": "1.0.0",
+      "source": "./skills/ledger-deep-dive",
+      "category": "accounting"
+    },
+    {
+      "name": "corporate-structure-overview",
+      "description": "View company directors, shareholders, and corporate subsidiaries for compliance and governance",
+      "version": "1.0.0",
+      "source": "./skills/corporate-structure-overview",
+      "category": "compliance"
+    }
+  ],
+  "mcp": {
+    "server": "https://mcp.osome.com/mcp",
+    "description": "OSOME MCP server providing accounting tools for OSOME-managed companies"
+  }
+}

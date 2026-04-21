@@ -58,7 +58,7 @@ https://mcp.osome.com/mcp
 
 - **Document details limited** - `list-documents` only returns `{ id, name }`, not amounts or due dates
 - **Invoice line items not available** - For detailed invoice info, users should access OSOME dashboard
-- **Report structure varies** - Actual field names depend on upstream report format
+- **Report structure varies** - Actual field names depend on the accounting system's report format
 
 ## Execution Flow
 

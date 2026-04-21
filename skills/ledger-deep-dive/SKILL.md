@@ -53,7 +53,7 @@ https://mcp.osome.com/mcp
 ## Execution Flow
 
 1. Call `list-companies` and select company
-2. Call `get-chart-of-accounts` with branch (SG/HK/UK) to find relevant account codes
+2. Call `get-chart-of-accounts` with jurisdiction code (SG/HK/UK) to find relevant account codes
 3. Call `search-transactions` with:
    - `id`: company ID
    - `dateFrom`: start date (YYYY-MM-DD)

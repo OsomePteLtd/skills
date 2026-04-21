@@ -43,7 +43,7 @@ https://mcp.osome.com/mcp
 - Company ID, name
 - Next fiscal year end date
 
-**From `get-chart-of-accounts` (requires branch parameter):**
+**From `get-chart-of-accounts` (requires jurisdiction code):**
 - Account codes, names, types
 - Tax accounts like GST Input/Output
 
@@ -66,7 +66,7 @@ https://mcp.osome.com/mcp
 1. Call `list-companies` and select company
 2. Call `get-company` to get fiscal year end
 3. Ask user for jurisdiction if not obvious from company name
-4. Call `get-chart-of-accounts` with branch (SG/HK/UK)
+4. Call `get-chart-of-accounts` with jurisdiction code (SG/HK/UK)
 5. Call `get-trial-balance` with date range
 6. Look for GST/VAT accounts in the report
 7. Call `get-profit-and-loss` for revenue/expense totals

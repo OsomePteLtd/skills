@@ -11,7 +11,7 @@
     {
       "name": "osome-accounting-skills",
       "description": "Accounting and bookkeeping skills powered by the OSOME MCP server. Includes financial health checks, cash flow analysis, receivables/payables tracking, ledger queries, and corporate structure overview.",
-      "source": "."
+      "source": ".."
     }
   ]
 }

@@ -24,26 +24,43 @@ This provides access to accounting tools for your OSOME-managed companies.
 
 ## Installation
 
-### Claude Code
+### From Marketplace
 
-In Claude Code, run the slash command:
+In Claude Code, run:
 
 ```
-/plugin install github:OsomePteLtd/skills
+/marketplace install osome-accounting-skills
+```
+
+### From GitHub
+
+Clone and install all skills:
+
+```bash
+git clone https://github.com/OsomePteLtd/skills.git osome-skills
+cp -r osome-skills/skills/* ~/.claude/skills/
 ```
 
 Or install a specific skill:
 
-```
-/plugin install github:OsomePteLtd/skills/skills/financial-health-check
-```
-
-### Manual Installation
-
-Copy the desired skill folder to your `.claude/skills/` directory:
-
 ```bash
-cp -r skills/financial-health-check ~/.claude/skills/
+git clone https://github.com/OsomePteLtd/skills.git osome-skills
+cp -r osome-skills/skills/financial-health-check ~/.claude/skills/
+```
+
+### Project-Level Installation
+
+Add to your project's `.claude/settings.json`:
+
+```json
+{
+  "plugins": [
+    {
+      "name": "osome-accounting-skills",
+      "source": "github:OsomePteLtd/skills"
+    }
+  ]
+}
 ```
 
 ## Usage

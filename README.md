@@ -24,42 +24,51 @@ This provides access to accounting tools for your OSOME-managed companies.
 
 ## Installation
 
-### From Marketplace
+### Claude Code (Recommended)
 
-In Claude Code, run:
+**Step 1:** Add the OSOME marketplace:
 
 ```
-/marketplace install osome-accounting-skills
+/plugin marketplace add OsomePteLtd/skills
 ```
 
-### From GitHub
+**Step 2:** Install the plugin:
 
-Clone and install all skills:
+```
+/plugin install osome-accounting-skills@osomepteltd-skills
+```
+
+**Step 3:** Reload plugins:
+
+```
+/reload-plugins
+```
+
+### Manual Installation
+
+Clone and copy skills to your personal skills directory:
 
 ```bash
 git clone https://github.com/OsomePteLtd/skills.git osome-skills
 cp -r osome-skills/skills/* ~/.claude/skills/
 ```
 
-Or install a specific skill:
+Or copy to a project's `.claude/skills/` directory for project-scoped installation.
 
-```bash
-git clone https://github.com/OsomePteLtd/skills.git osome-skills
-cp -r osome-skills/skills/financial-health-check ~/.claude/skills/
-```
+### Team/Project Configuration
 
-### Project-Level Installation
-
-Add to your project's `.claude/settings.json`:
+Add to your project's `.claude/settings.json` for automatic team installation:
 
 ```json
 {
-  "plugins": [
-    {
-      "name": "osome-accounting-skills",
-      "source": "github:OsomePteLtd/skills"
+  "extraKnownMarketplaces": {
+    "osome-skills": {
+      "source": {
+        "source": "github",
+        "repo": "OsomePteLtd/skills"
+      }
     }
-  ]
+  }
 }
 ```
 
@@ -72,6 +81,13 @@ Once installed, skills are automatically triggered by relevant questions:
 - "Who owes me money?" - triggers `receivables-payables-tracker`
 - "What did I spend on marketing?" - triggers `ledger-deep-dive`
 - "Who are my company directors?" - triggers `corporate-structure-overview`
+
+You can also invoke skills directly:
+
+```
+/osome-accounting-skills:financial-health-check
+/osome-accounting-skills:cash-flow-visibility
+```
 
 ## MCP Tools
 

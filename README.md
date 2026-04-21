@@ -50,7 +50,7 @@ Clone and copy skills to your personal skills directory:
 
 ```bash
 git clone https://github.com/OsomePteLtd/skills.git osome-skills
-cp -r osome-skills/plugins/osome-accounting-skills/skills/* ~/.claude/skills/
+cp -r osome-skills/skills/* ~/.claude/skills/
 ```
 
 Or copy to a project's `.claude/skills/` directory for project-scoped installation.

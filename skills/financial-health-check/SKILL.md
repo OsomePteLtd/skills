@@ -10,12 +10,14 @@ Get an instant snapshot of your company's financial position.
 ## When to Use
 
 Invoke this skill when the user asks:
+- "How is my business doing financially?"
 - "How is my business doing?"
-- "Am I making money?"
-- "Did I make a profit?"
 - "What's my financial health?"
+- "Company financial overview"
 - "Give me a financial summary"
 - "How profitable am I?"
+- "Am I making money?"
+- "Did I make a profit?"
 - "What's my runway?"
 - "How long can I survive?"
 - "Quick financial overview"

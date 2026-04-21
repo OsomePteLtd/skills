@@ -1,26 +1,38 @@
 ---
 name: corporate-structure-overview
-description: View company directors, shareholders, and subsidiaries. Use when the user asks about ownership, corporate structure, directors, or group companies. Requires OSOME MCP server at https://mcp.osome.com/mcp
+description: View company directors and subsidiaries. Use when the user asks about corporate structure, directors, or group companies. Requires OSOME MCP server at https://mcp.osome.com/mcp
 ---
 
 # Corporate Structure Overview
 
-Understand ownership, directors, and subsidiaries.
+View directors and subsidiary companies.
 
 ## When to Use
 
 Invoke this skill when the user asks:
+- "Who are my company directors?"
 - "Who are my directors?"
-- "Who owns the company?"
-- "Shareholder breakdown"
-- "Ownership structure"
-- "Cap table"
+- "What's my corporate structure?"
 - "List my subsidiaries"
-- "Group structure"
-- "Corporate structure for investors"
+- "Show me the group structure"
 - "Company officers"
 - "Who's on the board?"
-- "Equity split"
+- "List directors"
+- "Group companies"
+
+## Limitations
+
+The MCP server provides basic director and subsidiary information only:
+- Director names, roles, and jurisdictions
+- Subsidiary company names
+
+**Not available via MCP:**
+- Shareholding percentages (cap table)
+- Share counts or classes
+- Appointment dates
+- Ownership percentages between entities
+
+For detailed shareholding information, users should contact their OSOME account manager or check ACRA/company registry records directly.
 
 ## MCP Server
 
@@ -35,9 +47,8 @@ https://mcp.osome.com/mcp
 |------|------|---------|
 | 1 | `list-companies` | List accessible companies |
 | 2 | `get-company` | Company details and fiscal year |
-| 3 | `get-directors-shareholders` | Directors and shareholders |
+| 3 | `get-directors-shareholders` | Directors list (names, roles, jurisdiction) |
 | 4 | `get-corporate-subsidiaries` | Subsidiary companies |
-| 5 | `get-trial-balance` | Financial summary per entity (optional) |
 
 ## Execution Flow
 
@@ -49,62 +60,35 @@ https://mcp.osome.com/mcp
 3. If multiple companies exist:
    - Show group structure overview
    - For each entity, call `get-directors-shareholders`
-4. Optionally add financial context with `get-trial-balance`
-5. Present hierarchical corporate structure
+4. Present the corporate structure
 
 ## Output Format
 
 ### Single Company View
 
 **Company:** [Company Name]
-**Registration:** [Registration Number]
 **Jurisdiction:** [SG/HK/UK/UAE]
-**Incorporated:** [Date]
 **Fiscal Year End:** [Date]
 
 ---
 
 **Directors:**
-| Name | Role | Appointed | Status |
-|------|------|-----------|--------|
-| ... | Director / Managing Director | [date] | Active |
-
-**Shareholders:**
-| Name | Shares | Percentage | Type |
-|------|--------|------------|------|
-| ... | [number] | [%] | Ordinary |
-
-**Total Issued Capital:** [amount]
+| Name | Role | Jurisdiction |
+|------|------|--------------|
+| ... | Director / Managing Director | SG/HK/UK |
 
 ---
 
 ### Group Structure View
 
-```
-[Holding Company Name]
-├── [Subsidiary 1] (100% owned)
-│   └── [Sub-subsidiary] (100%)
-├── [Subsidiary 2] (75% owned)
-└── [Associate Company] (30% owned)
-```
+**[Holding Company Name]**
+- Subsidiary: [Subsidiary 1]
+- Subsidiary: [Subsidiary 2]
 
-**Group Summary:**
-| Entity | Jurisdiction | Ownership | Directors |
-|--------|--------------|-----------|-----------|
-| Holding Co | SG | - | 3 |
-| Sub 1 | SG | 100% | 2 |
-| Sub 2 | HK | 75% | 2 |
-
----
-
-### Financial Context (if requested)
-
-**Consolidated Position:**
-| Entity | Assets | Liabilities | Equity |
-|--------|--------|-------------|--------|
-| Holding | SGD 1.2M | SGD 400K | SGD 800K |
-| Sub 1 | SGD 500K | SGD 200K | SGD 300K |
-| Sub 2 | HKD 2M | HKD 800K | HKD 1.2M |
+**Directors across group:**
+| Name | Role | Companies |
+|------|------|-----------|
+| ... | ... | [list] |
 
 ## Examples
 
@@ -113,13 +97,13 @@ https://mcp.osome.com/mcp
 **Response:**
 > **ACME Pte Ltd - Directors**
 >
-> | Name | Role | Since |
-> |------|------|-------|
-> | John Smith | Managing Director | Jan 2020 |
-> | Jane Doe | Director | Mar 2021 |
-> | Bob Chen | Director | Jun 2022 |
+> | Name | Role | Jurisdiction |
+> |------|------|--------------|
+> | John Smith | Managing Director | SG |
+> | Jane Doe | Director | SG |
+> | Bob Chen | Director | SG |
 >
-> All directors are currently active. The company has 3 directors which meets Singapore's requirement of at least 1 local director.
+> The company has 3 directors. Singapore requires at least 1 local resident director.
 
 ---
 
@@ -128,41 +112,33 @@ https://mcp.osome.com/mcp
 **Response:**
 > **ACME Holdings Pte Ltd - Group Structure**
 >
-> ```
-> ACME Holdings Pte Ltd (Singapore)
-> ├── ACME Services Pte Ltd (100%)
-> ├── ACME HK Limited (100%)
-> └── TechPartner Pte Ltd (40% - Associate)
-> ```
+> **Subsidiaries:**
+> - ACME Services Pte Ltd
+> - ACME HK Limited
 >
-> **Ownership Summary:**
-> - ACME Holdings is owned by John Smith (60%) and Jane Doe (40%)
-> - 2 wholly-owned subsidiaries
-> - 1 associate company (40% stake)
+> **Directors:**
+> | Name | Role |
+> |------|------|
+> | John Smith | Managing Director |
+> | Jane Doe | Director |
 >
-> **Directors across group:**
-> - John Smith: Director in all 3 entities
-> - Jane Doe: Director in Holdings and Services
-> - Local HK Director: Director in ACME HK only
+> For detailed shareholding percentages, please check your ACRA BizFile records or contact your OSOME account manager.
 
 ---
 
-**User:** "Who owns the company?"
+**User:** "Who owns the company?" / "Cap table?"
 
 **Response:**
-> **ACME Pte Ltd - Shareholders**
+> Detailed shareholding information (cap table) is not available through this tool.
 >
-> | Shareholder | Shares | Percentage | Type |
-> |-------------|--------|------------|------|
-> | John Smith | 60,000 | 60% | Ordinary |
-> | Jane Doe | 30,000 | 30% | Ordinary |
-> | Employee Trust | 10,000 | 10% | Ordinary |
+> **What I can show you:**
+> - Directors: [list names and roles]
+> - Subsidiaries: [list if any]
 >
-> **Capital Structure:**
-> - Authorized: 100,000 ordinary shares
-> - Issued: 100,000 ordinary shares
-> - Par value: SGD 1.00
-> - Total issued capital: SGD 100,000
+> **For shareholding details:**
+> - Singapore: Check ACRA BizFile+ (https://www.bizfile.gov.sg)
+> - Hong Kong: Check Companies Registry (https://www.cr.gov.hk)
+> - Or contact your OSOME account manager
 
 ## Compliance Notes
 
@@ -177,5 +153,6 @@ https://mcp.osome.com/mcp
 | Scenario | Response |
 |----------|----------|
 | No subsidiaries | "This company has no subsidiaries on record" |
-| No shareholders | "Shareholder information not available" |
+| No directors found | "Director information not available" |
 | Multiple companies | Show summary table and ask which to explore |
+| Cap table request | Explain limitation and suggest alternatives |

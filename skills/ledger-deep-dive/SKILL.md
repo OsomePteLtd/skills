@@ -10,14 +10,18 @@ Answer specific questions about transactions and accounts.
 ## When to Use
 
 Invoke this skill when the user asks:
+- "What transactions hit [account name]?"
+- "Show me all marketing expenses"
+- "Journal entries for [period]"
+- "What's in my clearing accounts?"
+- "Explain this account balance"
+- "Transaction history for [account]"
 - "What did I spend on [category]?"
-- "Show me [expense type] transactions"
+- "Show me the details of [document/invoice]"
 - "How much did I spend on software/rent/marketing?"
-- "Transaction history"
 - "Find a specific payment"
 - "Details of invoice #[number]"
-- "Journal entries for [period]"
-- "What's in my clearing/suspense account?"
+- "What's in my suspense account?"
 - "Breakdown of [account]"
 - "List all [vendor] payments"
 - "Search for [keyword] in transactions"

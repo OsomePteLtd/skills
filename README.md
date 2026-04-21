@@ -26,12 +26,16 @@ This provides access to accounting tools for your OSOME-managed companies.
 
 ### Claude Code
 
-```bash
-# Install all skills
-claude skills add github:OsomePteLtd/skills
+In Claude Code, run the slash command:
 
-# Or install a specific skill
-claude skills add github:OsomePteLtd/skills/skills/financial-health-check
+```
+/plugin install github:OsomePteLtd/skills
+```
+
+Or install a specific skill:
+
+```
+/plugin install github:OsomePteLtd/skills/skills/financial-health-check
 ```
 
 ### Manual Installation

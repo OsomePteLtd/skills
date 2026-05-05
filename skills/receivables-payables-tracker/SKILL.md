@@ -42,6 +42,7 @@ https://mcp.osome.com/mcp
 | 3 | `get-aged-receivables` | Customer invoices by age bucket |
 | 4 | `get-aged-payables` | Vendor bills by age bucket |
 | 5 | `get-bank-accounts` | Current cash for context |
+| Optional | `upload-document` | Upload invoice PDFs, bills, remittance advice, or supporting documents |
 
 ## Data Available
 
@@ -54,11 +55,17 @@ https://mcp.osome.com/mcp
 **From `get-bank-accounts`:**
 - Account balances to show available cash
 
+**From `upload-document` (optional):**
+- Upload supporting documents for receivables or payables follow-up
+- Supported file types: PDF, JPG/JPEG, PNG, CSV, XLS, XLSX
+- Maximum file size: 50 MB
+
 ## Limitations
 
 - **Document details limited** - `list-documents` only returns `{ id, name }`, not amounts or due dates
 - **Invoice line items not available** - For detailed invoice info, users should access OSOME dashboard
 - **Report structure varies** - Actual field names depend on the accounting system's report format
+- **Document upload is two-step** - Call `upload-document` with `step: "prepare"`, upload the file to the returned presigned target, then call `step: "complete"` within 15 minutes
 
 ## Execution Flow
 
@@ -69,6 +76,11 @@ https://mcp.osome.com/mcp
 5. Call `get-bank-accounts` for cash context
 6. Parse report data to extract aging buckets
 7. Present prioritized view
+8. If the user needs to upload an invoice, bill, remittance advice, or supporting file, call `upload-document`:
+   - Prepare with `companyId`, `filename`, `contentType`, `sizeBytes`, and lowercase MD5 `checksum`
+   - If `duplicate: true`, explain that OSOME already has the document
+   - Upload the file to the returned presigned target
+   - Complete with the same metadata plus returned `preparedFile` and `uploadToken` within 15 minutes
 
 ## Report Structure
 

@@ -36,6 +36,7 @@ https://mcp.osome.com/mcp
 | 3 | `get-trial-balance` | Account balances including tax accounts |
 | 4 | `get-chart-of-accounts` | Identify tax-related account codes |
 | 5 | `get-profit-and-loss` | Revenue and expenses for tax computation |
+| Optional | `upload-document` | Upload supporting tax documents, receipts, invoices, or filing evidence |
 
 ## Data Available
 
@@ -55,11 +56,17 @@ https://mcp.osome.com/mcp
 - Revenue and expense totals
 - Net profit for tax estimation
 
+**From `upload-document` (optional):**
+- Prepare and complete uploads of supporting documents for tax filing
+- Supported file types: PDF, JPG/JPEG, PNG, CSV, XLS, XLSX
+- Maximum file size: 50 MB
+
 ## Limitations
 
 - **Jurisdiction not returned by API** - Ask user for their jurisdiction (SG/HK/UK/UAE) or infer from company name
 - **GST registration status not available** - Check if GST accounts exist in trial balance as proxy
 - **Filing deadlines not from API** - Use standard deadlines based on jurisdiction
+- **Document upload is two-step** - Call `upload-document` with `step: "prepare"`, upload the file to the returned presigned target, then call `step: "complete"` within 15 minutes
 
 ## Execution Flow
 
@@ -71,6 +78,11 @@ https://mcp.osome.com/mcp
 6. Look for GST/VAT accounts in the report
 7. Call `get-profit-and-loss` for revenue/expense totals
 8. Calculate estimated tax position
+9. If the user needs to provide supporting tax documents, call `upload-document`:
+   - Prepare with `companyId`, `filename`, `contentType`, `sizeBytes`, and lowercase MD5 `checksum`
+   - If `duplicate: true`, tell the user the document already exists and stop the upload flow
+   - Upload the file to the returned presigned target
+   - Complete with the same metadata plus returned `preparedFile` and `uploadToken`
 
 ## Jurisdiction Tax Reference
 
@@ -150,7 +162,9 @@ https://mcp.osome.com/mcp
 >
 > **For complete tax filing, you'll also need:**
 > - Bank statements (from your bank)
-> - Supporting documents (access via OSOME dashboard)
+> - Supporting documents such as receipts, invoices, bank statements, and tax schedules
+>
+> If you want to upload supporting documents now, I can use `upload-document` to prepare the upload, send the file to the returned upload target, and complete it in OSOME. Files must be PDF, JPG/JPEG, PNG, CSV, XLS, or XLSX and under 50 MB.
 
 ---
 

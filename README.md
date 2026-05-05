@@ -89,6 +89,7 @@ These skills orchestrate tools from the OSOME MCP server:
 - `search-transactions` - Search transactions with filters
 - `list-documents` - Accounting documents (ID and name only)
 - `get-document` - Document details (ID and name only)
+- `upload-document` - Two-step document upload for PDFs, images, and spreadsheets
 - `get-journal-entries` - Journal entries (ID, description, amount)
 - `get-bank-accounts` - Bank accounts and balances
 

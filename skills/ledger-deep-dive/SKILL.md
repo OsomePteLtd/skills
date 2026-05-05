@@ -26,6 +26,7 @@ The MCP server provides:
 - Chart of accounts (code, name, type, class)
 - Document list (IDs and names only)
 - Journal entry list (ID, description, amount only)
+- Document upload for supporting receipts and evidence
 
 **Not available via MCP:**
 - Detailed invoice line items, quantities, rates
@@ -33,7 +34,7 @@ The MCP server provides:
 - Document amounts, dates, or status
 - Contact/vendor details on documents
 
-For detailed document information, users should access the OSOME dashboard directly.
+For detailed document information, users should access the OSOME dashboard directly. If the user needs to add a receipt or supporting file, use `upload-document` to upload it to OSOME.
 
 ## MCP Server
 
@@ -49,6 +50,7 @@ https://mcp.osome.com/mcp
 | 1 | `list-companies` | Select company |
 | 2 | `get-chart-of-accounts` | Find account codes by name |
 | 3 | `search-transactions` | Transaction search with date filter |
+| Optional | `upload-document` | Upload receipts or supporting files for transaction follow-up |
 
 ## Execution Flow
 
@@ -61,6 +63,11 @@ https://mcp.osome.com/mcp
    - `limit`: max transactions (default 50, newest first)
 4. Filter results by account name/code if user specified
 5. Present transaction summary
+6. If the user wants to add a receipt or supporting document for follow-up, call `upload-document`:
+   - Prepare with `companyId`, `filename`, `contentType`, `sizeBytes`, and lowercase MD5 `checksum`
+   - If `duplicate: true`, explain that OSOME already has the document
+   - Upload the file to the returned presigned target
+   - Complete with the same metadata plus returned `preparedFile` and `uploadToken` within 15 minutes
 
 ## Chart of Accounts Response
 

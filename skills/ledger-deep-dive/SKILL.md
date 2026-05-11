@@ -26,7 +26,7 @@ The MCP server provides:
 - Chart of accounts (code, name, type, class)
 - Document list (IDs and names only)
 - Journal entry list (ID, description, amount only)
-- Document upload for supporting receipts and evidence
+- Document upload for supporting receipts and evidence via `prepare-document-upload` and `complete-document-upload`
 
 **Not available via MCP:**
 - Detailed invoice line items, quantities, rates
@@ -34,7 +34,7 @@ The MCP server provides:
 - Document amounts, dates, or status
 - Contact/vendor details on documents
 
-For detailed document information, users should access the OSOME dashboard directly. If the user needs to add a receipt or supporting file, use `upload-document` to upload it to OSOME.
+For detailed document information, users should access the OSOME dashboard directly. If the user needs to add a receipt or supporting file, use `prepare-document-upload`, upload bytes directly to the returned presigned target, then call `complete-document-upload`.
 
 ## MCP Server
 
@@ -50,7 +50,8 @@ https://mcp.osome.com/mcp
 | 1 | `list-companies` | Select company |
 | 2 | `get-chart-of-accounts` | Find account codes by name |
 | 3 | `search-transactions` | Transaction search with date filter |
-| Optional | `upload-document` | Upload receipts or supporting files for transaction follow-up |
+| Optional | `prepare-document-upload` | Prepare upload of receipts or supporting files for transaction follow-up |
+| Optional | `complete-document-upload` | Complete document creation after bytes are uploaded to the presigned target |
 
 ## Execution Flow
 
@@ -63,11 +64,13 @@ https://mcp.osome.com/mcp
    - `limit`: max transactions (default 50, newest first)
 4. Filter results by account name/code if user specified
 5. Present transaction summary
-6. If the user wants to add a receipt or supporting document for follow-up, call `upload-document`:
+6. If the user wants to add a receipt or supporting document for follow-up, use the document upload flow:
    - Prepare with `companyId`, `filename`, `contentType`, `sizeBytes`, and lowercase MD5 `checksum`
+   - Call `prepare-document-upload` (requires OAuth scope `company:documents:write`)
    - If `duplicate: true`, explain that OSOME already has the document
-   - Upload the file to the returned presigned target
-   - Complete with the same metadata plus returned `preparedFile` and `uploadToken` within 15 minutes
+   - Upload the file bytes outside MCP to `upload.method`/`upload.url` using returned `upload.fields`; include returned form fields exactly and append the file last
+   - Do not send file bytes, `contentBase64`, or arbitrary upload headers to MCP
+   - Call `complete-document-upload` with the same metadata plus `uploadToken`
 
 ## Chart of Accounts Response
 

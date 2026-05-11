@@ -36,7 +36,8 @@ https://mcp.osome.com/mcp
 | 3 | `get-trial-balance` | Account balances including tax accounts |
 | 4 | `get-chart-of-accounts` | Identify tax-related account codes |
 | 5 | `get-profit-and-loss` | Revenue and expenses for tax computation |
-| Optional | `upload-document` | Upload supporting tax documents, receipts, invoices, or filing evidence |
+| Optional | `prepare-document-upload` | Prepare upload of supporting tax documents, receipts, invoices, or filing evidence |
+| Optional | `complete-document-upload` | Complete document creation after bytes are uploaded to the presigned target |
 
 ## Data Available
 
@@ -56,8 +57,10 @@ https://mcp.osome.com/mcp
 - Revenue and expense totals
 - Net profit for tax estimation
 
-**From `upload-document` (optional):**
-- Prepare and complete uploads of supporting documents for tax filing
+**From document upload tools (optional):**
+- `prepare-document-upload` returns `duplicate`, `maxSizeBytes`, optional `document`, or an `upload` target plus `uploadToken`
+- Upload supporting documents for tax filing to the returned presigned POST target
+- `complete-document-upload` creates the OSOME document after the file bytes are uploaded
 - Supported file types: PDF, JPG/JPEG, PNG, CSV, XLS, XLSX
 - Maximum file size: 50 MB
 
@@ -66,7 +69,7 @@ https://mcp.osome.com/mcp
 - **Jurisdiction not returned by API** - Ask user for their jurisdiction (SG/HK/UK/UAE) or infer from company name
 - **GST registration status not available** - Check if GST accounts exist in trial balance as proxy
 - **Filing deadlines not from API** - Use standard deadlines based on jurisdiction
-- **Document upload is two-step** - Call `upload-document` with `step: "prepare"`, upload the file to the returned presigned target, then call `step: "complete"` within 15 minutes
+- **Document upload uses two MCP tools plus direct file upload** - Call `prepare-document-upload`, upload the file directly to the returned presigned POST target, then call `complete-document-upload` with the same metadata and `uploadToken`
 
 ## Execution Flow
 
@@ -78,11 +81,13 @@ https://mcp.osome.com/mcp
 6. Look for GST/VAT accounts in the report
 7. Call `get-profit-and-loss` for revenue/expense totals
 8. Calculate estimated tax position
-9. If the user needs to provide supporting tax documents, call `upload-document`:
+9. If the user needs to provide supporting tax documents, use the document upload flow:
    - Prepare with `companyId`, `filename`, `contentType`, `sizeBytes`, and lowercase MD5 `checksum`
+   - Call `prepare-document-upload` (requires OAuth scope `company:documents:write`)
    - If `duplicate: true`, tell the user the document already exists and stop the upload flow
-   - Upload the file to the returned presigned target
-   - Complete with the same metadata plus returned `preparedFile` and `uploadToken`
+   - Upload the file bytes outside MCP to `upload.method`/`upload.url` using returned `upload.fields`; include returned form fields exactly and append the file last
+   - Do not send file bytes, `contentBase64`, or arbitrary upload headers to MCP
+   - Call `complete-document-upload` with the same metadata plus `uploadToken`
 
 ## Jurisdiction Tax Reference
 
@@ -164,7 +169,7 @@ https://mcp.osome.com/mcp
 > - Bank statements (from your bank)
 > - Supporting documents such as receipts, invoices, bank statements, and tax schedules
 >
-> If you want to upload supporting documents now, I can use `upload-document` to prepare the upload, send the file to the returned upload target, and complete it in OSOME. Files must be PDF, JPG/JPEG, PNG, CSV, XLS, or XLSX and under 50 MB.
+> If you want to upload supporting documents now, I can use `prepare-document-upload`, send the file to the returned presigned upload target, and then call `complete-document-upload` to create it in OSOME. Files must be PDF, JPG/JPEG, PNG, CSV, XLS, or XLSX and under 50 MB.
 
 ---
 

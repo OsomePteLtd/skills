@@ -42,7 +42,8 @@ https://mcp.osome.com/mcp
 | 3 | `get-aged-receivables` | Customer invoices by age bucket |
 | 4 | `get-aged-payables` | Vendor bills by age bucket |
 | 5 | `get-bank-accounts` | Current cash for context |
-| Optional | `upload-document` | Upload invoice PDFs, bills, remittance advice, or supporting documents |
+| Optional | `prepare-document-upload` | Prepare upload of invoice PDFs, bills, remittance advice, or supporting documents |
+| Optional | `complete-document-upload` | Complete document creation after bytes are uploaded to the presigned target |
 
 ## Data Available
 
@@ -55,8 +56,10 @@ https://mcp.osome.com/mcp
 **From `get-bank-accounts`:**
 - Account balances to show available cash
 
-**From `upload-document` (optional):**
-- Upload supporting documents for receivables or payables follow-up
+**From document upload tools (optional):**
+- `prepare-document-upload` returns `duplicate`, `maxSizeBytes`, optional `document`, or an `upload` target plus `uploadToken`
+- Upload supporting documents for receivables or payables follow-up to the returned presigned POST target
+- `complete-document-upload` creates the OSOME document after the file bytes are uploaded
 - Supported file types: PDF, JPG/JPEG, PNG, CSV, XLS, XLSX
 - Maximum file size: 50 MB
 
@@ -65,7 +68,7 @@ https://mcp.osome.com/mcp
 - **Document details limited** - `list-documents` only returns `{ id, name }`, not amounts or due dates
 - **Invoice line items not available** - For detailed invoice info, users should access OSOME dashboard
 - **Report structure varies** - Actual field names depend on the accounting system's report format
-- **Document upload is two-step** - Call `upload-document` with `step: "prepare"`, upload the file to the returned presigned target, then call `step: "complete"` within 15 minutes
+- **Document upload uses two MCP tools plus direct file upload** - Call `prepare-document-upload`, upload the file directly to the returned presigned POST target, then call `complete-document-upload` with the same metadata and `uploadToken`
 
 ## Execution Flow
 
@@ -76,11 +79,13 @@ https://mcp.osome.com/mcp
 5. Call `get-bank-accounts` for cash context
 6. Parse report data to extract aging buckets
 7. Present prioritized view
-8. If the user needs to upload an invoice, bill, remittance advice, or supporting file, call `upload-document`:
+8. If the user needs to upload an invoice, bill, remittance advice, or supporting file, use the document upload flow:
    - Prepare with `companyId`, `filename`, `contentType`, `sizeBytes`, and lowercase MD5 `checksum`
+   - Call `prepare-document-upload` (requires OAuth scope `company:documents:write`)
    - If `duplicate: true`, explain that OSOME already has the document
-   - Upload the file to the returned presigned target
-   - Complete with the same metadata plus returned `preparedFile` and `uploadToken` within 15 minutes
+   - Upload the file bytes outside MCP to `upload.method`/`upload.url` using returned `upload.fields`; include returned form fields exactly and append the file last
+   - Do not send file bytes, `contentBase64`, or arbitrary upload headers to MCP
+   - Call `complete-document-upload` with the same metadata plus `uploadToken`
 
 ## Report Structure
 

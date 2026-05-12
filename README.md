@@ -1,16 +1,16 @@
 # OSOME Accounting Skills
 
-Agent skills for accounting and bookkeeping, powered by the [OSOME MCP Server](https://mcp.osome.com/mcp).
+Agent skills for accounting and bookkeeping, powered by the OSOME MCP server.
 
 ## Prerequisites
 
-Connect the OSOME MCP server to your Claude/OpenCode environment:
+Connect the OSOME MCP server to your Claude/OpenCode environment as a Streamable HTTP MCP endpoint:
 
 ```
 https://mcp.osome.com/mcp
 ```
 
-This provides access to accounting tools for your OSOME-managed companies.
+The MCP endpoint handles JSON-RPC over `POST /mcp`. Authentication is via OAuth bearer token; MCP clients can discover OAuth metadata from `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`. Read-only tools require `openid`; document upload additionally requires `company:documents:write`.
 
 ## Available Skills
 
@@ -86,11 +86,15 @@ These skills orchestrate tools from the OSOME MCP server:
 
 ### Accounting
 - `get-chart-of-accounts` - Chart of accounts by jurisdiction
-- `search-transactions` - Search transactions with filters
+- `search-transactions` - Search transactions with optional date range and limit (newest first; default 50)
 - `list-documents` - Accounting documents (ID and name only)
 - `get-document` - Document details (ID and name only)
+- `prepare-document-upload` - Step 1 for document upload; returns a presigned POST target and `uploadToken`
+- `complete-document-upload` - Step 3 for document upload; creates the OSOME document after bytes are uploaded to the presigned target
 - `get-journal-entries` - Journal entries (ID, description, amount)
 - `get-bank-accounts` - Bank accounts and balances
+
+Document upload supports PDF, JPG/JPEG, PNG, CSV, XLS, and XLSX files up to 50 MB. Do not send file bytes or `contentBase64` to MCP: upload the file directly to the presigned POST target returned by `prepare-document-upload`, then call `complete-document-upload` with the same metadata and `uploadToken`.
 
 ### Reports
 - `get-balance-sheet` - Balance sheet report

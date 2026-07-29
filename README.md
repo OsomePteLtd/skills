@@ -1,6 +1,6 @@
-# OSOME Accounting Skills
+# OSOME Accounting and Invoicing Skills
 
-Agent skills for accounting and bookkeeping, powered by the OSOME MCP server.
+Agent skills for accounting, bookkeeping, and invoicing, powered by the OSOME MCP server.
 
 ## Prerequisites
 
@@ -10,7 +10,7 @@ Connect the OSOME MCP server to your Claude/OpenCode environment as a Streamable
 https://mcp.osome.com/mcp
 ```
 
-The MCP endpoint handles JSON-RPC over `POST /mcp`. Authentication is via OAuth bearer token; MCP clients can discover OAuth metadata from `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`. Read-only tools require `openid`; document upload additionally requires `company:documents:write`.
+The MCP endpoint handles JSON-RPC over `POST /mcp`. Authentication is via OAuth bearer token; MCP clients can discover OAuth metadata from `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`. Accounting read-only tools require `openid`; invoicing reads require `invoice:read`; invoicing writes require `invoice:write`; document upload additionally requires `company:documents:write`.
 
 ## Available Skills
 
@@ -22,6 +22,8 @@ The MCP endpoint handles JSON-RPC over `POST /mcp`. Authentication is via OAuth 
 | [ledger-deep-dive](./skills/ledger-deep-dive) | Query specific transactions and accounts |
 | [corporate-structure-overview](./skills/corporate-structure-overview) | View directors and subsidiaries |
 | [tax-compliance-snapshot](./skills/tax-compliance-snapshot) | Check GST/VAT obligations and prepare for tax filing |
+| [invoice-creator](./skills/invoice-creator) | Create, update, submit, duplicate, preview, and generate invoice PDFs |
+| [invoice-revenue-insights](./skills/invoice-revenue-insights) | Analyze invoice revenue, pending invoices, overdue invoices, and collections |
 
 ## Installation
 
@@ -75,6 +77,8 @@ Once installed, skills are automatically triggered by relevant questions:
 - "What did I spend on software?" → `ledger-deep-dive`
 - "Who are my directors?" → `corporate-structure-overview`
 - "How much GST do I owe?" → `tax-compliance-snapshot`
+- "Create an invoice for Acme" → `invoice-creator`
+- "Which invoices are overdue?" → `invoice-revenue-insights`
 
 ## MCP Tools
 
@@ -96,6 +100,23 @@ These skills orchestrate tools from the OSOME MCP server:
 
 Document upload supports PDF, JPG/JPEG, PNG, CSV, XLS, and XLSX files up to 50 MB. Do not send file bytes or `contentBase64` to MCP: upload the file directly to the presigned POST target returned by `prepare-document-upload`, then call `complete-document-upload` with the same metadata and `uploadToken`.
 
+### Invoicing
+- `list-customers` - List invoice customers for a company
+- `create-customer` - Create an invoice customer
+- `create-invoice-draft` - Create a draft invoice
+- `update-invoice-draft` - Update a draft invoice with customer, line items, dates, currency, notes, and payment methods
+- `submit-invoice` - Finalize and send a draft invoice
+- `generate-invoice-pdf` - Generate invoice document links; submits drafts first when needed
+- `preview-invoice` - Get invoice data without mutation
+- `get-invoice-document-links` - Get generated invoice document preview and original URLs
+- `list-invoices` - List invoices with status, search, and pagination filters
+- `duplicate-invoice` - Duplicate an invoice into a new draft
+- `create-credit-note` - Create a draft credit note for an issued invoice
+- `submit-credit-note` - Submit and apply a credit note
+- `get-credit-note` - Get a credit note and safe invoice summary
+
+Invoice reads require `invoice:read`; invoice writes require `invoice:write`. `submit-invoice`, `generate-invoice-pdf` for drafts, and `submit-credit-note` finalize externally visible accounting documents, so agents should confirm final details first. The MCP server does not expose invoice deletion or pro-forma invoice creation.
+
 ### Reports
 - `get-balance-sheet` - Balance sheet report
 - `get-profit-and-loss` - Profit & loss statement
@@ -103,6 +124,11 @@ Document upload supports PDF, JPG/JPEG, PNG, CSV, XLS, and XLSX files up to 50 M
 - `get-trial-balance` - Trial balance
 - `get-aged-payables` - Accounts payable aging
 - `get-aged-receivables` - Accounts receivable aging
+- `get-aged-receivables-v2` - Aged receivables v2 report
+- `get-overdue-invoices` - Overdue receivables derived from aged receivables v2
+- `get-invoice-pending-summary` - Awaiting, future, and overdue invoice pending totals
+- `get-profit-and-loss-v2` - Profit & loss v2 report
+- `get-revenue-summary` - Founder-friendly revenue summary from profit & loss v2
 
 ### Compliance
 - `get-corporate-subsidiaries` - Subsidiary companies

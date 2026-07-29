@@ -5,13 +5,13 @@
     "email": "support@osome.com"
   },
   "metadata": {
-    "description": "OSOME accounting and bookkeeping skills",
-    "version": "1.0.0"
+    "description": "OSOME accounting, bookkeeping, and invoicing skills",
+    "version": "1.1.0"
   },
   "plugins": [
     {
       "name": "osome-accounting-skills",
-      "description": "Accounting and bookkeeping skills powered by the OSOME MCP server",
+      "description": "Accounting, bookkeeping, and invoicing skills powered by the OSOME MCP server",
       "source": "./",
       "skills": [
         "./skills/financial-health-check",
@@ -19,7 +19,9 @@
         "./skills/receivables-payables-tracker",
         "./skills/ledger-deep-dive",
         "./skills/corporate-structure-overview",
-        "./skills/tax-compliance-snapshot"
+        "./skills/tax-compliance-snapshot",
+        "./skills/invoice-creator",
+        "./skills/invoice-revenue-insights"
       ]
     }
   ]

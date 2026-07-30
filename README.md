@@ -10,7 +10,7 @@ Connect the OSOME MCP server to your Claude/OpenCode environment as a Streamable
 https://mcp.osome.com/mcp
 ```
 
-The MCP endpoint handles JSON-RPC over `POST /mcp`. Authentication is via OAuth bearer token; MCP clients can discover OAuth metadata from `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`. Accounting read-only tools require `openid`; invoicing reads require `invoice:read`; invoicing writes require `invoice:write`; document upload additionally requires `company:documents:write`.
+The MCP endpoint handles JSON-RPC over `POST /mcp`. Authentication is via OAuth bearer token; MCP clients can discover OAuth metadata from `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`. Accounting read-only tools require `openid`; invoicing reads require `invoice:read`; invoicing writes require `invoice:write`; document upload and transaction comment writes require `company:documents:write`.
 
 ## Available Skills
 
@@ -75,6 +75,7 @@ Once installed, skills are automatically triggered by relevant questions:
 - "Where is my money going?" → `cash-flow-visibility`
 - "Who hasn't paid me?" → `receivables-payables-tracker`
 - "What did I spend on software?" → `ledger-deep-dive`
+- "What comments are on this transaction?" → `ledger-deep-dive`
 - "Who are my directors?" → `corporate-structure-overview`
 - "How much GST do I owe?" → `tax-compliance-snapshot`
 - "Create an invoice for Acme" → `invoice-creator`
@@ -91,12 +92,16 @@ These skills orchestrate tools from the OSOME MCP server:
 ### Accounting
 - `get-chart-of-accounts` - Chart of accounts by jurisdiction
 - `search-transactions` - Search transactions with optional date range and limit (newest first; default 50)
+- `get-transaction-conversation` - Read the comments conversation attached to a transaction
+- `add-transaction-comment` - Add a text comment to a transaction conversation; creates the conversation when needed
 - `list-documents` - Accounting documents (ID and name only)
 - `get-document` - Document details (ID and name only)
 - `prepare-document-upload` - Step 1 for document upload; returns a presigned POST target and `uploadToken`
 - `complete-document-upload` - Step 3 for document upload; creates the OSOME document after bytes are uploaded to the presigned target
 - `get-journal-entries` - Journal entries (ID, description, amount)
 - `get-bank-accounts` - Bank accounts and balances
+
+Transaction comments are the same comments users see on the transaction page in OSOME. Find the transaction first with `search-transactions`, then use the numeric transaction document ID with `get-transaction-conversation` or `add-transaction-comment`. Posting a comment is a write action and requires `company:documents:write`.
 
 Document upload supports PDF, JPG/JPEG, PNG, CSV, XLS, and XLSX files up to 50 MB. Do not send file bytes or `contentBase64` to MCP: upload the file directly to the presigned POST target returned by `prepare-document-upload`, then call `complete-document-upload` with the same metadata and `uploadToken`.
 

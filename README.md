@@ -10,7 +10,7 @@ Connect the OSOME MCP server to your Claude/OpenCode environment as a Streamable
 https://mcp.osome.com/mcp
 ```
 
-The MCP endpoint handles JSON-RPC over `POST /mcp`. Authentication is via OAuth bearer token; MCP clients can discover OAuth metadata from `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`. Accounting read-only tools require `openid`; invoicing reads require `invoice:read`; invoicing writes require `invoice:write`; document upload additionally requires `company:documents:write`.
+The MCP endpoint handles JSON-RPC over `POST /mcp`. Authentication is via OAuth bearer token; MCP clients can discover OAuth metadata from `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`. Accounting read-only tools require `openid`; invoicing reads require `invoice:read`; invoicing writes require `invoice:write`; document upload and transaction cashcoding writes additionally require `company:documents:write`.
 
 ## Available Skills
 
@@ -20,6 +20,7 @@ The MCP endpoint handles JSON-RPC over `POST /mcp`. Authentication is via OAuth 
 | [cash-flow-visibility](./skills/cash-flow-visibility) | Understand where money is coming from and going |
 | [receivables-payables-tracker](./skills/receivables-payables-tracker) | Track who owes you and who you owe |
 | [ledger-deep-dive](./skills/ledger-deep-dive) | Query specific transactions and accounts |
+| [transaction-cashcoding](./skills/transaction-cashcoding) | Review and apply cashcoding recommendations to transactions |
 | [corporate-structure-overview](./skills/corporate-structure-overview) | View directors and subsidiaries |
 | [tax-compliance-snapshot](./skills/tax-compliance-snapshot) | Check GST/VAT obligations and prepare for tax filing |
 | [invoice-creator](./skills/invoice-creator) | Create, update, submit, duplicate, preview, and generate invoice PDFs |
@@ -75,6 +76,7 @@ Once installed, skills are automatically triggered by relevant questions:
 - "Where is my money going?" → `cash-flow-visibility`
 - "Who hasn't paid me?" → `receivables-payables-tracker`
 - "What did I spend on software?" → `ledger-deep-dive`
+- "Can you code this transaction?" → `transaction-cashcoding`
 - "Who are my directors?" → `corporate-structure-overview`
 - "How much GST do I owe?" → `tax-compliance-snapshot`
 - "Create an invoice for Acme" → `invoice-creator`
@@ -95,10 +97,14 @@ These skills orchestrate tools from the OSOME MCP server:
 - `get-document` - Document details (ID and name only)
 - `prepare-document-upload` - Step 1 for document upload; returns a presigned POST target and `uploadToken`
 - `complete-document-upload` - Step 3 for document upload; creates the OSOME document after bytes are uploaded to the presigned target
+- `list-transaction-cashcoding-recommendations` - List account recommendations for cashcoding a transaction
+- `apply-transaction-cashcoding-recommendation` - Apply a selected cashcoding account recommendation to a transaction
 - `get-journal-entries` - Journal entries (ID, description, amount)
 - `get-bank-accounts` - Bank accounts and balances
 
 Document upload supports PDF, JPG/JPEG, PNG, CSV, XLS, and XLSX files up to 50 MB. Do not send file bytes or `contentBase64` to MCP: upload the file directly to the presigned POST target returned by `prepare-document-upload`, then call `complete-document-upload` with the same metadata and `uploadToken`.
+
+Transaction cashcoding uses the numeric OSOME transaction document ID. Ask the user to confirm the transaction and selected account before calling `apply-transaction-cashcoding-recommendation`; applying a recommendation requires `company:documents:write`.
 
 ### Invoicing
 - `list-customers` - List invoice customers for a company
